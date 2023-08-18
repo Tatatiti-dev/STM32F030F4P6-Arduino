@@ -6,6 +6,7 @@
 #define OLED_H
 
 #include <Arduino.h>
+#include <Adafruit_GFX.h>
 
 #define OLED_ADDRESS            0x3C
 
@@ -20,22 +21,14 @@
 #define HORIZONTAL_ADDRESSING   0x00
 #define PAGE_ADDRESSING         0x02
 
-class OLED {
+#define BLACK 0
+#define WHITE 1
+
+class OLED : public Adafruit_GFX{
 
 public:
-
+	OLED(byte width = 128, byte height = 64);
     byte addressingMode;
-    bool wideFont = false;
-    int chrSpace = 1;   // 1 -  3
-    void printChar(char c, byte X=255, byte Y=255);
-    void printString(const char *String, byte X=255, byte Y=255, byte numChar=255);
-    void printBigNumber(const char *number, byte column=0, byte page=0, byte numChar=255);
-    void printBigNumber(int i, byte X, byte Y);
-    void printInt(int j, byte X=255, byte Y=255);
-    void drawLine(int page, byte data);
-    byte printNumber(long n, byte X=255, byte Y=255);
-    byte printNumber(float float_num, byte prec=6, byte Y=255, byte numChar=255);
-    void drawBitmap(const byte *bitmaparray, byte X, byte Y, byte width, byte height);
     void init(int sda= -1, int scl = -1);
     void setCursorXY(byte Column, byte Row);
     void clearDisplay();
@@ -43,15 +36,20 @@ public:
     void setPowerOn();
     void setPageMode();
     void setHorizontalMode();
+	void drawPixel(int x, int y, uint16_t color);
+	void display();
 
 private:
+	uint8_t buf[1024] {
+		B10000000, B10000000, B11000000, B11000000, B11100000, B11100000, B11110000, B11110000, 
+		B11111000, B11111000, B11111100, B11111100, B11111110, B11111110, B11111111, B11111111,
+	};
     void sendCommand(byte command);
     void sendData(byte Data);
     char ibuffer[60];  // for i2c
     char buffer[20];  // for integer calc
 };
 
-extern OLED Oled;  // OLED object
 
 #endif
 
